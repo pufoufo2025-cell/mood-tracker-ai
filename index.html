@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Tracker AI - 情緒記錄 & 任務管理</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">Mood Tracker AI</h1>
+                <nav class="nav-tabs">
+                    <button class="tab-btn active" data-tab="mood">Mood 情緒</button>
+                    <button class="tab-btn" data-tab="tasks">Tasks 任務</button>
+                    <button class="tab-btn" data-tab="review">Review 回顧</button>
+                    <button class="tab-btn" data-tab="settings">設定</button>
+                </nav>
+                <button class="settings-btn" id="settingsBtn">⚙️</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Mood Tab -->
+            <section class="tab-content active" id="mood-tab">
+                <div class="card mood-card">
+                    <h2>今日情緒記錄</h2>
+                    <div class="mood-slider-container">
+                        <label>選擇你的情緒 (1-5)</label>
+                        <div class="mood-visual">
+                            <span id="moodEmoji" class="mood-emoji">😐</span>
+                            <span id="moodScore" class="mood-score">3</span>
+                        </div>
+                        <input type="range" min="1" max="5" value="3" id="moodSlider" class="mood-slider">
+                        <div class="mood-labels">
+                            <span>😭</span>
+                            <span>😥</span>
+                            <span>😐</span>
+                            <span>🙂</span>
+                            <span>🥰</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="moodTags">標籤 (逗鼻區隔)</label>
+                        <input type="text" id="moodTags" placeholder="e.g. 工作, 壓氉, 家人">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="moodNote">記錄筆記</label>
+                        <textarea id="moodNote" placeholder="記錄今天的事氣..." rows="4"></textarea>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="saveMoodBtn">保存記錄</button>
+                </div>
+
+                <!-- Past Moods -->
+                <div class="card past-moods-card">
+                    <h2>最近記錄</h2>
+                    <div id="pastMoodsList" class="moods-list"></div>
+                </div>
+            </section>
+
+            <!-- Tasks Tab -->
+            <section class="tab-content" id="tasks-tab">
+                <div class="card task-input-card">
+                    <h2>新增任務</h2>
+                    <div class="form-group">
+                        <label for="taskTitle">任務標題</label>
+                        <input type="text" id="taskTitle" placeholder="整理辩公室...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="taskDesc">任務描述</label>
+                        <textarea id="taskDesc" placeholder="詳述任務的詳細内容..." rows="3"></textarea>
+                    </div>
+                    
+                    <div class="eisenhower-selector">
+                        <label>艾森豪矩陣位置</label>
+                        <div class="matrix-buttons">
+                            <button class="matrix-btn urgent-important" data-urgent="true" data-important="true">
+                                <span class="label">紧急 &amp; 重要</span>
+                                <span class="desc">需間下做</span>
+                            </button>
+                            <button class="matrix-btn important" data-urgent="false" data-important="true">
+                                <span class="label">重要</span>
+                                <span class="desc">排程</span>
+                            </button>
+                            <button class="matrix-btn urgent" data-urgent="true" data-important="false">
+                                <span class="label">紧急</span>
+                                <span class="desc">代辩</span>
+                            </button>
+                            <button class="matrix-btn neither" data-urgent="false" data-important="false">
+                                <span class="label">不紧 &amp; 不重</span>
+                                <span class="desc">十撮</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="addTaskBtn">新增任務</button>
+                        <button class="btn btn-secondary" id="aiSuggestBtn">AI 建蹰</button>
+                    </div>
+                </div>
+
+                <!-- Eisenhower Matrix View -->
+                <div class="card matrix-card">
+                    <h2>艾森豪优先顺序矩陣</h2>
+                    <div class="matrix-grid">
+                        <div class="matrix-quadrant do-now">
+                            <h3>需間下做 (Do Now)</h3>
+                            <div id="do-now" class="task-quadrant"></div>
+                        </div>
+                        <div class="matrix-quadrant schedule">
+                            <h3>排程 (Schedule)</h3>
+                            <div id="schedule" class="task-quadrant"></div>
+                        </div>
+                        <div class="matrix-quadrant delegate">
+                            <h3>代辩 (Delegate)</h3>
+                            <div id="delegate" class="task-quadrant"></div>
+                        </div>
+                        <div class="matrix-quadrant delete">
+                            <h3>十撮 (Delete)</h3>
+                            <div id="delete" class="task-quadrant"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Review Tab -->
+            <section class="tab-content" id="review-tab">
+                <div class="card review-card">
+                    <h2>月度回顧</h2>
+                    <div class="form-group">
+                        <label for="reviewMonth">選擇月份</label>
+                        <input type="month" id="reviewMonth" class="month-picker">
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">當月上推分</span>
+                            <span class="stat-value" id="avgMood">3.0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">最高分</span>
+                            <span class="stat-value" id="maxMood">5</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">最低分</span>
+                            <span class="stat-value" id="minMood">1</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">記錄天數</span>
+                            <span class="stat-value" id="recordDays">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="monthly-chart">
+                        <h3>怪趣記錄</h3>
+                        <canvas id="moodChart"></canvas>
+                    </div>
+                    
+                    <div class="tags-analysis">
+                        <h3>標籤统計</h3>
+                        <div id="tagsStats"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Tab -->
+            <section class="tab-content" id="settings-tab">
+                <div class="card settings-card">
+                    <h2>設定選項</h2>
+                    
+                    <div class="settings-section">
+                        <h3>Grok API 設定</h3>
+                        <div class="form-group">
+                            <label for="grokApiKey">Grok API Key</label>
+                            <input type="password" id="grokApiKey" placeholder="輸入你的 Grok API Key...">
+                            <small>你的 API key 將仅存存在浏覽器本機上</small>
+                        </div>
+                        <button class="btn btn-primary" id="saveApiKeyBtn">Save API Key</button>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3>數據管理</h3>
+                        <div class="data-actions">
+                            <button class="btn btn-secondary" id="exportDataBtn">💡 Export JSON</button>
+                            <button class="btn btn-secondary" id="importDataBtn">📄 Import JSON</button>
+                            <input type="file" id="importFile" accept="application/json" style="display:none;">
+                            <button class="btn btn-danger" id="clearDataBtn">🗑 Clear All Data</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Hidden Elements for File Input -->
+    <input type="file" id="importFile" accept="application/json" style="display:none;">
+
+    <!-- Scripts -->
+    <script src="storage.js"></script>
+    <script src="eisenhower.js"></script>
+    <script src="grok-api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
